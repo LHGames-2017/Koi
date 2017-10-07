@@ -3,6 +3,7 @@ from structs import *
 from Dijkstra import *
 import json
 import numpy
+import math
 
 app = Flask(__name__)
 
@@ -49,7 +50,10 @@ def deserialize_map(serialized_map):
 
     return deserialized_map
 
+goback = False
+
 def bot():
+    global goback
     """
     Main de votre bot.
     """
@@ -76,7 +80,6 @@ def bot():
 
     otherPlayers = []
 
-
     for players in map_json["OtherPlayers"]:
         player_info = players["Value"]
         p_pos = player_info["Position"]
@@ -86,29 +89,68 @@ def bot():
 
         otherPlayers.append(player_info)
 
+    if house["X"] == x and house["Y"] == y:
+        goback = False
+    
+    if player.CarriedRessources == player.CarryingCapacity:
+        goback = True
+
     m = remove_fog(deserialized_map)
     g = makeGraph(m)
+
+    print_map(m, x, y)
+    print(player.CarriedRessources)
+
+    if goback:
+        return gohome(g, x, y, house, m)
+
+
 
     p = None
     res = find_resource(m)
     for (rx,ry) in res:
+        dx = rx - 10
+        dy = ry - 10
+        d  = abs(dx) + abs(dy)
+
+#        print(d,dx,dy,x,y)
+        if d == 1:
+            return create_collect_action(Point(x+dy,y+dx))
+
         try:
             p = shortestPath(g, 10+10*20, rx+ry*20)
         except:
             continue
 
-    print_map(m, x, y)
 
-    print("res", res)
-    print("path", p)
+#    print("res", res)
+#    print("path", p)
     (mx, my) = d1_to_d2(p[1], m)
 
     dx = mx-10
     dy = my-10
 
-    print(mx, my,x,y)
+#    print(mx, my,x,y)
 
     # return decision
+    return create_move_action(Point(x+dy,y+dx))
+
+def gohome(g, x, y, house, m):
+    hx = house["X"]
+    hy = house["Y"]
+
+    dx = hx-x
+    dy = hy-y
+
+    p = shortestPath(g, 10+10*20, (10+dy)+(10+dx)*20)
+
+    (mx, my) = d1_to_d2(p[1], m)
+
+    dx = mx-10
+    dy = my-10
+
+    print(dx, dy, x, y)
+    
     return create_move_action(Point(x+dy,y+dx))
 
 def d1_to_d2(n, m):
@@ -188,4 +230,5 @@ def reponse():
     return bot()
 
 if __name__ == "__main__":
+    goback = False
     app.run(host="0.0.0.0", port=8080)
