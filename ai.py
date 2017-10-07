@@ -1,5 +1,6 @@
 from flask import Flask, request
 from structs import *
+from Dijkstra import *
 import json
 import numpy
 
@@ -60,11 +61,13 @@ def bot():
     map_json = json.loads(encoded_map)
     p = map_json["Player"]
     pos = p["Position"]
+
     x = pos["X"]
     y = pos["Y"]
+
     house = p["HouseLocation"]
     player = Player(p["Health"], p["MaxHealth"], Point(x,y),
-                    Point(house["X"], house["Y"]),
+                    Point(house["X"], house["Y"]), p["Score"],
                     p["CarriedResources"], p["CarryingCapacity"])
 
     # Map
@@ -73,26 +76,57 @@ def bot():
 
     otherPlayers = []
 
-    for player_dict in map_json["OtherPlayers"]:
-        for player_name in player_dict.keys():
-            player_info = player_dict[player_name]
-            if player_info == notAtPlayer:
-                continue
 
-            p_pos = player_info["Position"]
-            player_info = PlayerInfo(player_info["Health"],
+    for players in map_json["OtherPlayers"]:
+        player_info = players["Value"]
+        p_pos = player_info["Position"]
+        player_info = PlayerInfo(player_info["Health"],
                                      player_info["MaxHealth"],
                                      Point(p_pos["X"], p_pos["Y"]))
 
-            otherPlayers.append({player_name: player_info })
-
+        otherPlayers.append(player_info)
 
     m = remove_fog(deserialized_map)
+    g = makeGraph(m)
+
+    res = find_resource(m)
+    print(res)
+    for (rx,ry) in res:
+        try:
+            p = shortestPath(g, 10+10*20, rx+ry*20)
+            print(p)
+        except:
+            print("except",rx,ry)
+            continue
+
 
     print_map(m, x, y)
 
+
+#    print(G)
+#    P = shortestPath(G, 10+10*20, 10-5+5*20)
+#    print(P)
+
+
+
     # return decision
     return create_move_action(Point(x+0,y+1))
+
+def find_resource(m):
+    w = len(m)
+    h = len(m[0])
+
+    res = []
+
+    for j in range(0, h):
+        for i in range(0, w):
+            cell = m[j][i]
+
+            if cell.Content == TileType.Resource:
+                res.append((i,j))
+
+    return res
+                
 
 def remove_fog(m):
     i = 0

@@ -2,7 +2,7 @@
 # David Eppstein, UC Irvine, 4 April 2002
 
 # http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/117228
-from priodict import priorityDictionary
+from prioroty import priorityDictionary
 from structs import *
 
 
@@ -99,11 +99,11 @@ def isValide(matrice, x, y):
 
     tile = matrice[y][x]
 
-    if tile.content == TileType.Wall:
+    if tile.Content == TileType.Wall:
         return False
-    if tile.content == TileType.Lava:
+    if tile.Content == TileType.Lava:
         return False
-    if tile.content == TileType.Shop:
+    if tile.Content == TileType.Shop:
         return False
 
 
@@ -123,6 +123,7 @@ def getAdj(matrice, x, y):
         adj[x + (y - 1) * w] = 1
     if isValide(matrice, x, y + 1):
         adj[x + (y + 1) * w] = 1
+
     return adj
 
 def makeGraph(matrice):
@@ -136,4 +137,5 @@ def makeGraph(matrice):
         for x in range(0, w):
             graph[x + y * w] = getAdj(matrice, x, y)
 
+    return graph
 
