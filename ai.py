@@ -89,28 +89,48 @@ def bot():
     m = remove_fog(deserialized_map)
     g = makeGraph(m)
 
+    p = None
     res = find_resource(m)
-    print(res)
     for (rx,ry) in res:
         try:
             p = shortestPath(g, 10+10*20, rx+ry*20)
-            print(p)
         except:
-            print("except",rx,ry)
             continue
-
 
     print_map(m, x, y)
 
+    print("res", res)
+    print("path", p)
+    (mx, my) = d1_to_d2(p[1], m)
 
-#    print(G)
-#    P = shortestPath(G, 10+10*20, 10-5+5*20)
-#    print(P)
+    dx = mx-10
+    dy = my-10
 
-
+    print(mx, my,x,y)
 
     # return decision
-    return create_move_action(Point(x+0,y+1))
+    return create_move_action(Point(x+dy,y+dx))
+
+def d1_to_d2(n, m):
+    w = len(m[0])
+    h = len(m)
+
+    x = n % w
+    y = n / w
+
+    return (x, y)
+
+def local_to_global(px, py, mx, my, m):
+    w = len(m[0])
+    h = len(m)
+
+    ox = px - 10
+    oy = py - 10
+
+    x = mx + ox
+    y = my + oy
+
+    return (x, y)
 
 def find_resource(m):
     w = len(m)
