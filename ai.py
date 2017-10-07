@@ -83,8 +83,20 @@ def bot():
 
             otherPlayers.append({player_name: player_info })
 
+    print_map(deserialized_map, x, y)
+
     # return decision
     return create_move_action(Point(0,1))
+
+def print_map(m, x, y):
+    for row in m:
+        for tile in row:
+            if tile.X == x and tile.Y == y:
+                sys.stdout.write("p ")
+                continue
+
+            tile.printt()
+        print(" ")
 
 @app.route("/", methods=["POST"])
 def reponse():
@@ -94,4 +106,4 @@ def reponse():
     return bot()
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=3000)
+    app.run(host="0.0.0.0", port=8080)

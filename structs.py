@@ -1,4 +1,5 @@
 import math
+import sys
 
 class ActionTypes():
     DefaultAction, MoveAction, AttackAction, CollectAction, UpgradeAction, StealAction, PurchaseAction = range(7)
@@ -56,6 +57,23 @@ class Tile(object):
         self.X = x
         self.Y = y
 
+    def printt(self):
+        if self.Content == None:
+            sys.stdout.write("N ")
+        elif self.Content == TileType.Tile:
+            sys.stdout.write("T ")
+        elif self.Content == TileType.Wall:
+            sys.stdout.write("W ")
+        elif self.Content == TileType.House:
+            sys.stdout.write("H ")
+        elif self.Content == TileType.Lava:
+            sys.stdout.write("L ")
+        elif self.Content == TileType.Resource:
+            sys.stdout.write("R ")
+        elif self.Content == TileType.Shop:
+            sys.stdout.write("S ")
+        sys.stdout.flush()
+
 
 class Player(object):
 
@@ -81,4 +99,4 @@ class ActionContent(object):
 
     def __init__(self, action_name, content):
         self.ActionName = action_name
-        self.Content = {}
+        self.Content = content
