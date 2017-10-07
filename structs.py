@@ -8,13 +8,12 @@ class ActionTypes():
 class UpgradeType():
     CarryingCapacity, AttackPower, Defence, MaximumHealth, CollectingSpeed = range(5)
 
-
 class TileType():
     Tile, Wall, House, Lava, Resource, Shop = range(6)
 
 
 class TileContent():
-    Empty, Resource, House, Player, Wall, Lava, Shop = range(7)
+    Empty, Wall, House, Lava, Resource, Shop, Player = range(7)
 
 
 class Point(object):
@@ -99,4 +98,4 @@ class ActionContent(object):
 
     def __init__(self, action_name, content):
         self.ActionName = action_name
-        self.Content = content
+        self.Content = str(content)

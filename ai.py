@@ -76,6 +76,9 @@ def bot():
     for player_dict in map_json["OtherPlayers"]:
         for player_name in player_dict.keys():
             player_info = player_dict[player_name]
+            if player_info == notAtPlayer:
+                continue
+
             p_pos = player_info["Position"]
             player_info = PlayerInfo(player_info["Health"],
                                      player_info["MaxHealth"],
@@ -83,10 +86,35 @@ def bot():
 
             otherPlayers.append({player_name: player_info })
 
-    print_map(deserialized_map, x, y)
+
+    m = remove_fog(deserialized_map)
+
+    print_map(m, x, y)
 
     # return decision
-    return create_move_action(Point(0,1))
+    return create_move_action(Point(x+0,y+1))
+
+def remove_fog(m):
+    i = 0
+    j = 0
+
+    cell = m[0][i]
+    while not (cell.Content == None):
+        i+=1
+        cell = m[0][i]
+    
+    cell = m[j][0]
+    while not (cell.Content == None):
+        j+=1
+        cell = m[j][0]
+
+    matrix = [[0]*i for n in range(j)]
+    for jj in range(0, j):
+        for ii in range(0, i):
+            matrix[jj][ii] = m[jj][ii]
+
+    print(i, j)
+    return matrix
 
 def print_map(m, x, y):
     for row in m:
