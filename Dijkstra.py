@@ -99,8 +99,8 @@ def isValide(matrice, x, y):
 
     tile = matrice[y][x]
 
-    if tile.Content == TileType.Wall:
-        return False
+#    if tile.Content == TileType.Wall:
+#        return False
     if tile.Content == TileType.Lava:
         return False
     if tile.Content == TileType.Shop:

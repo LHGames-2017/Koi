@@ -97,12 +97,16 @@ def bot():
     m = remove_fog(deserialized_map)
     print_map(m, x, y)
 
-    if m[11][10].Content == TileType.Tile:
-        return create_move_action(Point(x+1,y))
+#    if m[11][10].Content == TileType.Tile:
+#        return create_move_action(Point(x+1,y))
     if m[11][10].Content == TileType.Wall:
         return create_attack_action(Point(x+1,y))
-
-
+    if m[9][10].Content == TileType.Wall:
+        return create_attack_action(Point(x-1,y))
+    if m[10][11].Content == TileType.Wall:
+        return create_attack_action(Point(x,y+1))
+    if m[10][9].Content == TileType.Wall:
+        return create_attack_action(Point(x,y-1))
 #    if house["X"] == x and house["Y"] == y:
 #        if trybuy:
 #            print("BOUGHT THE UPGRADE")
@@ -115,12 +119,12 @@ def bot():
 #        goback = True
 #        trybuy = True
 #
-#    m = remove_fog(deserialized_map)
-#    g = makeGraph(m)
-#
-#    print_map(m, x, y)
-#    print(player.CarriedRessources)
-#    print(player.Score)
+    m = remove_fog(deserialized_map)
+    g = makeGraph(m)
+
+    print_map(m, x, y)
+    print(player.CarriedRessources)
+    print(player.Score)
 #
 #    if goback:
 #        return gohome(g, x, y, house, m)
@@ -128,33 +132,34 @@ def bot():
 #
 #
 #    p = None
-#    res = find_resource(m)
-#    for (rx,ry) in res:
-#        dx = rx - 10
-#        dy = ry - 10
-#        d  = abs(dx) + abs(dy)
-#
-##        print(d,dx,dy,x,y)
-#        if d == 1:
-#            return create_collect_action(Point(x+dy,y+dx))
-#
-#        try:
-#            p = shortestPath(g, 10+10*20, rx+ry*20)
-#        except:
-#            continue
+    res = find_resource(m)
+    for (rx,ry) in res:
+        dx = rx - 10
+        dy = ry - 10
+        d  = abs(dx) + abs(dy)
+
+#        print(d,dx,dy,x,y)
+        if d == 1:
+            return create_collect_action(Point(x+dy,y+dx))
+
+        try:
+            p = shortestPath(g, 10+10*20, rx+ry*20)
+        except:
+            continue
 #
 #
 ##    print("res", res)
 #    print("path", p)
-#    (mx, my) = d1_to_d2(p[1], m)
-#
-#    dx = mx-10
-#    dy = my-10
+    (mx, my) = d1_to_d2(p[1], m)
+
+    dx = mx-10
+    dy = my-10
 #
 ##    print(mx, my,x,y)
 #
 #    # return decision
-#    return create_move_action(Point(x+dy,y+dx))
+    return create_move_action(Point(x+dy,y+dx))
+
 
 def gohome(g, x, y, house, m):
     hx = house["X"]
@@ -205,7 +210,7 @@ def find_resource(m):
         for i in range(0, w):
             cell = m[j][i]
 
-            if cell.Content == TileType.Resource:
+            if cell.Content == TileType.Wall:
                 res.append((i,j))
 
     return res
@@ -252,4 +257,4 @@ def reponse():
 
 if __name__ == "__main__":
     goback = False
-    app.run(host="0.0.0.0", port=3000)
+    app.run(host="0.0.0.0", port=8080)
