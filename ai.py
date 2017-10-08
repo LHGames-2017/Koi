@@ -29,6 +29,9 @@ def create_heal_action():
 def create_purchase_action(item):
     return create_action("PurchaseAction", item)
 
+def create_upgrade_action(item):
+    return json.dumps({"ActionName": "UpgradeAction", "Content": item})
+
 def deserialize_map(serialized_map):
     """
     Fonction utilitaire pour comprendre la map
@@ -51,9 +54,11 @@ def deserialize_map(serialized_map):
     return deserialized_map
 
 goback = False
+trybuy = False
 
 def bot():
     global goback
+    global trybuy
     """
     Main de votre bot.
     """
@@ -89,51 +94,67 @@ def bot():
 
         otherPlayers.append(player_info)
 
-    if house["X"] == x and house["Y"] == y:
-        goback = False
-    
-    if player.CarriedRessources == player.CarryingCapacity:
-        goback = True
-
     m = remove_fog(deserialized_map)
-    g = makeGraph(m)
-
     print_map(m, x, y)
-    print(player.CarriedRessources)
 
-    if goback:
-        return gohome(g, x, y, house, m)
-
-
-
-    p = None
-    res = find_resource(m)
-    for (rx,ry) in res:
-        dx = rx - 10
-        dy = ry - 10
-        d  = abs(dx) + abs(dy)
-
-#        print(d,dx,dy,x,y)
-        if d == 1:
-            return create_collect_action(Point(x+dy,y+dx))
-
-        try:
-            p = shortestPath(g, 10+10*20, rx+ry*20)
-        except:
-            continue
+    if m[11][10].Content == TileType.Tile:
+        return create_move_action(Point(x+1,y))
+    if m[11][10].Content == TileType.Wall:
+        return create_attack_action(Point(x+1,y))
 
 
-#    print("res", res)
+#    if house["X"] == x and house["Y"] == y:
+#        if trybuy:
+#            print("BOUGHT THE UPGRADE")
+#            trybuy = False
+#            return create_upgrade_action(UpgradeType.CollectingSpeed)
+#
+#        goback = False
+#    
+#    if player.CarriedRessources == player.CarryingCapacity:
+#        goback = True
+#        trybuy = True
+#
+#    m = remove_fog(deserialized_map)
+#    g = makeGraph(m)
+#
+#    print_map(m, x, y)
+#    print(player.CarriedRessources)
+#    print(player.Score)
+#
+#    if goback:
+#        return gohome(g, x, y, house, m)
+#
+#
+#
+#    p = None
+#    res = find_resource(m)
+#    for (rx,ry) in res:
+#        dx = rx - 10
+#        dy = ry - 10
+#        d  = abs(dx) + abs(dy)
+#
+##        print(d,dx,dy,x,y)
+#        if d == 1:
+#            return create_collect_action(Point(x+dy,y+dx))
+#
+#        try:
+#            p = shortestPath(g, 10+10*20, rx+ry*20)
+#        except:
+#            continue
+#
+#
+##    print("res", res)
 #    print("path", p)
-    (mx, my) = d1_to_d2(p[1], m)
-
-    dx = mx-10
-    dy = my-10
-
-#    print(mx, my,x,y)
-
-    # return decision
-    return create_move_action(Point(x+dy,y+dx))
+#    (mx, my) = d1_to_d2(p[1], m)
+#
+#    dx = mx-10
+#    dy = my-10
+#
+##    print(mx, my,x,y)
+#
+#    # return decision
+#    return create_move_action(Point(x+dy,y+dx))
 
 def gohome(g, x, y, house, m):
     hx = house["X"]
